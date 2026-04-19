@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Sushi 💖</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle, #000000, #1a001a);
+  overflow: hidden;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+/* Popup text */
+.popup {
+  position: absolute;
+  padding: 10px 20px;
+  background: rgba(255,192,203,0.2);
+  backdrop-filter: blur(5px);
+  color: pink;
+  border-radius: 20px;
+  font-size: 18px;
+  animation: floatUp 6s linear forwards;
+}
+
+@keyframes floatUp {
+  0% {opacity: 1; transform: translateY(0);}
+  100% {opacity: 0; transform: translateY(-150px);}
+}
+
+/* Heart */
+.heart {
+  position: absolute;
+  color: pink;
+  font-size: 20px;
+  animation: fly 5s linear infinite;
+}
+
+@keyframes fly {
+  0% {transform: translateY(100vh) scale(1);}
+  100% {transform: translateY(-10vh) scale(1.5);}
+}
+
+/* Start dialog */
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffb6c1;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 22px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 0 20px pink;
+  z-index: 999;
+}
+</style>
+</head>
+
+<body>
+
+<div id="startDialog" class="dialog">
+  Đừng bấm nếu không muốn biết Bao nghĩ gì về Sushi 😳💖
+</div>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<script>
+const messages = [
+  "I miss you 💖",
+  "I love you 💕",
+  "Only you 💫",
+  "I just want you 🌙",
+  "Bao love sushi 🍣",
+  "Bao love su 💞",
+  "Bao love shi 😳",
+  "Hồng Ngọc Linh is special ✨",
+  "You're my favorite person 💗",
+  "Stay with me nha 🥺"
+];
+
+function createPopup() {
+  const div = document.createElement("div");
+  div.className = "popup";
+  div.innerText = messages[Math.floor(Math.random() * messages.length)];
+
+  div.style.left = Math.random() * window.innerWidth + "px";
+  div.style.top = Math.random() * window.innerHeight + "px";
+
+  document.body.appendChild(div);
+
+  setTimeout(() => div.remove(), 6000);
+}
+
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.innerHTML = "💖";
+
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.fontSize = (10 + Math.random() * 20) + "px";
+
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 5000);
+}
+
+function startEffect() {
+  setInterval(createPopup, 200);
+  setInterval(createHeart, 300);
+}
+
+function fullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen();
+}
+
+document.addEventListener("click", function start() {
+  document.getElementById("startDialog").style.display = "none";
+
+  const music = document.getElementById("music");
+  music.volume = 0.5;
+  music.play();
+
+  fullscreen();
+  startEffect();
+
+  document.removeEventListener("click", start);
+});
+</script>
+
+</body>
+</html>
