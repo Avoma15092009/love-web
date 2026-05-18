@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi NgocLinh Đáng Yêu Của GiaBao 💖</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #ffeef2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Envelope Styling */
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 300px;
+            height: 200px;
+        }
+        .envelope-wrapper.hover-effect:hover { transform: scale(1.05); }
+        
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #ff7597;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #ff4d79;
+            transform-origin: top;
+            transition: transform 0.4s ease;
+            z-index: 3;
+        }
+        .envelope.open::before {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Letter Inside */
+        .letter {
+            position: absolute;
+            top: 10px; left: 15px;
+            width: 270px; height: 180px;
+            background: white;
+            border-radius: 6px;
+            padding: 20px 15px;
+            text-align: center;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+            opacity: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .envelope.open .letter {
+            transform: translateY(-140px);
+            height: auto;
+            opacity: 1;
+            z-index: 4;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .letter p {
+            font-size: 13.5px;
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* Heart Button */
+        .heart-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            z-index: 5;
+            transition: all 0.3s ease;
+            animation: pulse 1.2s infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.15); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        .envelope.open ~ .heart-btn {
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, -50%) scale(0);
+        }
+
+        /* Nút nhận quà */
+        .gift-btn {
+            background: linear-gradient(135deg, #ff4d79, #ff7597);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(255, 77, 121, 0.3);
+            transition: transform 0.2s;
+        }
+        .gift-btn:hover { transform: scale(1.05); }
+
+        /* Certificate Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .certificate {
+            background: #ffffec;
+            border: 10px double #d4af37;
+            padding: 35px 25px;
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popUp { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .cert-title { font-family: 'Georgia', serif; color: #d4af37; font-size: 26px; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; }
+        .cert-name { font-size: 24px; font-weight: bold; color: #e6003d; margin: 15px 0; border-bottom: 2px dashed #ffb3c6; display: inline-block; padding: 0 20px; }
+        .cert-content { font-style: italic; font-size: 15.5px; color: #444; margin-bottom: 25px; line-height: 1.7; }
+        .cert-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px; color: #666; align-items: flex-end; }
+        .signature { font-size: 16px; color: #ff4d79; font-weight: bold; margin-top: 5px; }
+        
+        .close-btn {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 28px; cursor: pointer; color: #aaa; transition: color 0.2s;
+        }
+        .close-btn:hover { color: #333; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="nhac.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="envelope-wrapper hover-effect" id="envWrapper" onclick="openEnvelope()">
+        <div class="envelope" id="envelope">
+            <div class="letter">
+                <p><b>Gửi NgocLinh của anh, 💖</b></p>
+                <p>Anh biết kết quả học tập năm nay làm em hơi buồn một xíu. Nhưng với anh, một tờ giấy khen không nói lên hết được sự chăm chỉ của em suốt cả năm qua.</p>
+                <p>Em đã cố gắng rất nhiều rồi, anh đều biết và tự hào về em lắm! Đừng buồn nữa nha, anh có món quà bất ngờ này cho em nè...</p>
+                <button class="gift-btn" onclick="showCert(event)">Nhận Quà Của Anh 🎁</button>
+            </div>
+        </div>
+        <div class="heart-btn">❤️</div>
+    </div>
+
+    <div class="modal" id="certModal">
+        <div class="certificate">
+            <span class="close-btn" onclick="closeCert()">&times;</span>
+            <div class="cert-title">Giấy Khen Danh Dự</div>
+            <p style="font-size: 15px; color: #555;">Khen tặng em bé người yêu:</p>
+            <div class="cert-name">Ngọc Linh ✨</div>
+            <div class="cert-content">
+                Đã xuất sắc đạt danh hiệu<br>
+                <b>"HỌC SINH XUẤT SẮC TRONG LÒNG ANH"</b><br>
+                kiêm <b>"NGƯỜI YÊU TUYỆT VỜI NHẤT HỆ MẶT TRỜI"</b>.<br>
+                <span style="font-size: 13px; color: #777;">Thành tích: Luôn đáng yêu, chịu khó và là nguồn năng lượng số 1 của Gia Bảo.</span>
+            </div>
+            <div class="cert-footer">
+                <div><i>Ngày 18 tháng 05, 2026</i></div>
+                <div>
+                    <p>Người cấp bằng</p>
+                    <p class="signature">GiaBao của NgocLinh 🐻</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const music = document.getElementById('bgMusic');
+
+        // Ép trình duyệt nhận diện tương tác để mở nhạc
+        document.body.addEventListener('click', function() {
+            if (music.paused) {
+                music.play().catch(err => console.log("Gỡ block autoplay"));
+            }
+        }, { once: false });
+
+        function openEnvelope() {
+            const env = document.getElementById('envelope');
+            const wrapper = document.getElementById('envWrapper');
+            
+            if(!env.classList.contains('open')) {
+                env.classList.add('open');
+                wrapper.classList.remove('hover-effect');
+                
+                music.play().catch(err => console.log("Lỗi duyệt âm thanh"));
+            }
+        }
+
+        function showCert(event) {
+            event.stopPropagation(); 
+            document.getElementById('certModal').style.display = 'flex';
+            
+            // Hiệu ứng pháo hoa trái tim bung lụa
+            var duration = 5 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#ff4d79', '#ff7597', '#ffb3c6', '#ffffff']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#ff4d79', '#ff7597', '#ffb3c6', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function closeCert() {
+            document.getElementById('certModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
